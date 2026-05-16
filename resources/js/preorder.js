@@ -42,6 +42,8 @@ function orderRowTemplate(id) {
               <select class="product-type" required>
                 <option value="fruit">Tomate fruit</option>
                 <option value="puree">Tomate en purée</option>
+                <option value="lapin">Lapin</option>
+                <option value="poulet_goliath">Poulet Goliath</option>
               </select>
             </div>
             <div class="field">
@@ -61,9 +63,31 @@ function orderRowTemplate(id) {
         `;
 }
 
+function getMinDate(type) {
+    const d = new Date();
+    if (type === 'fruit' || type === 'puree') {
+        d.setMonth(d.getMonth() + 3);
+    } else {
+        d.setDate(d.getDate() + 7);
+    }
+    return d.toISOString().split('T')[0];
+}
+
+function updateRowDateMin(row) {
+    const type = row.querySelector('.product-type').value;
+    const dateInput = row.querySelector('.delivery-date');
+    const minDate = getMinDate(type);
+    dateInput.min = minDate;
+    if (dateInput.value && dateInput.value < minDate) {
+        dateInput.value = minDate;
+    }
+}
+
 function addRow() {
     rowId += 1;
     rowsContainer.insertAdjacentHTML('beforeend', orderRowTemplate(rowId));
+    const newRow = rowsContainer.lastElementChild;
+    updateRowDateMin(newRow);
     computeTotals();
 }
 
@@ -79,13 +103,20 @@ rowsContainer.addEventListener('click', (e) => {
 });
 
 rowsContainer.addEventListener('input', computeTotals);
-rowsContainer.addEventListener('change', computeTotals);
+rowsContainer.addEventListener('change', (e) => {
+    if (e.target.classList.contains('product-type')) {
+        updateRowDateMin(e.target.closest('.order-row'));
+    }
+    computeTotals();
+});
 
 function computeTotals() {
     const rows = [...rowsContainer.querySelectorAll('.order-row')];
     let total = 0;
     let fruit = 0;
     let puree = 0;
+    let lapin = 0;
+    let pouletGoliath = 0;
 
     rows.forEach(row => {
         const qty = Number(row.querySelector('.qty').value || 0);
@@ -93,17 +124,25 @@ function computeTotals() {
         total += qty;
         if (type === 'fruit') fruit += qty;
         if (type === 'puree') puree += qty;
+        if (type === 'lapin') lapin += qty;
+        if (type === 'poulet_goliath') pouletGoliath += qty;
     });
 
     totalKgEl.textContent = `${total} kg`;
     fruitKgEl.textContent = `${fruit} kg`;
     pureeKgEl.textContent = `${puree} kg`;
+    const lapinEl = document.getElementById('lapinKg');
+    if (lapinEl) lapinEl.textContent = `${lapin} kg`;
+    const pouletEl = document.getElementById('pouletGoliathKg');
+    if (pouletEl) pouletEl.textContent = `${pouletGoliath} kg`;
+
     optionalAmountEl.textContent = `${(total * 100).toLocaleString('fr-FR')} FCFA`;
-    return { total, fruit, puree };
+    return { total, fruit, puree, lapin, pouletGoliath };
 }
 
 preorderForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    clearErrors();
 
     const totals = computeTotals();
     const rows = [...rowsContainer.querySelectorAll('.order-row')].map(row => ({
@@ -122,6 +161,8 @@ preorderForm.addEventListener('submit', async (e) => {
         total_kg: totals.total,
         fruit_kg: totals.fruit,
         puree_kg: totals.puree,
+        lapin_kg: totals.lapin,
+        poulet_goliath_kg: totals.pouletGoliath,
         deliveries: rows,
         optional_prepayment: totals.total * 100
     };
@@ -137,109 +178,77 @@ preorderForm.addEventListener('submit', async (e) => {
             body: JSON.stringify(data)
         });
 
+        if (!response.ok) {
+            const result = await response.json();
+            showErrors(result.errors || { error: ['Erreur de validation des données'] });
+            const firstError = document.querySelector('.error-message');
+            if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
         const result = await response.json();
         if (result.success) {
             console.log('Précommande ID:', result.preorder_id);
+            reservationData = {
+                id: result.preorder_id,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                phone: data.phone,
+                optionalPrepayment: result.total_prepay || data.optional_prepayment
+            };
             afterSubmit.classList.add('visible');
             afterSubmit.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
             alert('Erreur: ' + (result.message || 'Vérifiez vos données'));
         }
     } catch (error) {
-        alert('Erreur connexion: ' + error.message);
+        showErrors({ error: ['Erreur de connexion au serveur'] });
     }
 });
 
-const publicKey = window.APP_CONFIG.kkiapayPublicKey;
-const callbackUrl = window.APP_CONFIG.kkiapayCallback;
+const paydunyaUrl = window.APP_CONFIG.paydunyaUrl;
 
-payNowBtn.addEventListener('click', () => {
+payNowBtn.addEventListener('click', async () => {
     if (!reservationData) {
-        alert("Enregistre d'abord la réservation.");
+        alert("Enregistrez d'abord la réservation.");
         return;
     }
 
-    openKkiapayWidget({
-        amount: reservationData.optionalPrepayment,
-        key: publicKey,
-        sandbox: true,
-        position: 'center',
-        theme: '#c62828',
-        callback: callbackUrl,
-        phone: reservationData.phone || '',
-        email: reservationData.email || '',
-        name: `${reservationData.firstName} ${reservationData.lastName}`
-    });
-});
-
-
-/*payNowBtn.addEventListener('click', () => {
-    if (!reservationData) return;
-    const amount = reservationData.optionalPrepayment;
-    if (!amount || amount <= 0) {
-        alert('Ajoutez d\'abord une quantité valide.');
-        return;
-    }
-
-    if (typeof openKkiapayWidget !== 'function') {
-        alert('Le SDK KKiaPay n\'est pas chargé.');
-        return;
-    }
-
-    openKkiapayWidget({
-        amount,
-        key: 'VOTRE_CLE_PUBLIQUE_KKIAPAY',
-        sandbox: true,
-        position: 'center',
-        theme: '#c62828',
-        phone: reservationData.phone || '',
-        email: reservationData.email || '',
-        name: `${reservationData.firstName} ${reservationData.lastName}`,
-        data: JSON.stringify({
-            type: 'precommande-tomate',
-            amount,
-            reservation: reservationData
-        })
-    });
-});*/
-
-skipPayBtn.addEventListener('click', () => {
-    alert('La réservation est déjà enregistrée. Vous pourrez relancer le paiement plus tard par email, WhatsApp ou appel.');
-});
-
-
-preorderForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    // Clear erreurs précédentes
-    clearErrors();
-
-    const data = { /* tes données */ };
+    payNowBtn.disabled = true;
+    payNowBtn.textContent = 'Création de la facture...';
 
     try {
-        const response = await fetch('/preorder/store', {
+        const res = await fetch(paydunyaUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify({ preorder_id: reservationData.id })
         });
 
-        if (!response.ok) {
-            const result = await response.json();
-            showErrors(result.errors || { error: ['Erreur serveur'] });
-            return;
+        const result = await res.json();
+        if (result.success && result.url) {
+            window.location.href = result.url;
+        } else {
+            alert('Erreur: ' + (result.message || 'Impossible d\'initialiser le paiement PayDunya.'));
+            payNowBtn.disabled = false;
+            payNowBtn.textContent = 'Payer mon acompte';
         }
-
-        const result = await response.json();
-        afterSubmit.classList.add('visible');
-
-    } catch (error) {
-        showErrors({ error: ['Erreur connexion'] });
+    } catch (err) {
+        alert('Erreur de connexion au serveur.');
+        payNowBtn.disabled = false;
+        payNowBtn.textContent = 'Payer mon acompte';
     }
 });
+
+skipPayBtn.addEventListener('click', () => {
+    if (!reservationData) return;
+    window.location.href = '/preorder/thank-you?id=' + reservationData.id;
+});
+
 
 // Fonctions utilitaires erreurs
 function clearErrors() {

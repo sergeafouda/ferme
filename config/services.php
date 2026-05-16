@@ -40,4 +40,16 @@ return [
         'callback' => env('KKIAPAY_CALLBACK_URL'),
     ],
 
+    'paydunya' => [
+        'master_key' => env('PAYDUNYA_MASTER_KEY'),
+        'private_key' => env('PAYDUNYA_PRIVATE_KEY'),
+        'public_key' => env('PAYDUNYA_PUBLIC_KEY'),
+        'token' => env('PAYDUNYA_TOKEN'),
+        'mode' => env('PAYDUNYA_MODE', 'test'),
+    ],
+
+    'whatsapp' => [
+        'phone' => env('WHATSAPP_PHONE', '22960000000'),
+    ],
+
 ];

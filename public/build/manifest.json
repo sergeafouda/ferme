@@ -1,0 +1,38 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-BtDN30XV.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/preorder.css": {
+    "file": "assets/preorder-pVAIEFUK.css",
+    "src": "resources/css/preorder.css",
+    "isEntry": true,
+    "name": "preorder",
+    "names": [
+      "preorder.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DaEWUuO6.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "resources/js/preorder.js"
+    ],
+    "css": [
+      "assets/preorder-pVAIEFUK.css"
+    ]
+  },
+  "resources/js/preorder.js": {
+    "file": "assets/preorder-C-eCo0_F.js",
+    "name": "preorder",
+    "src": "resources/js/preorder.js",
+    "isEntry": true
+  }
+}
