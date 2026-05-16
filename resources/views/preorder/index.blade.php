@@ -15,13 +15,16 @@
             <div class="container">
                 <div class="hero-grid">
                     <div>
-                        <div class="eyebrow">Précommande pilote Tomate fruit/purée</div>
-                        <h1>Réservez votre récolte avant la contre-saison</h1>
-                        <p class="lead">Nous transformons et organisons la production en saison normale pour mieux maîtriser les coûts, puis nous livrons en contre-saison avec l'objectif de garder les prix en dessous du marché au moment de la récolte et de la distribution.</p>
+                        <div class="eyebrow">Précommandez vos produits dès maintenant</div>
+                        <h1>Des produits de qualité, disponibles quand vous en avez besoin, à un prix compétitif</h1>
+                        <p class="lead">Nous savons que ce qui compte le plus pour vous, c’est d’avoir des produits fiables, accessibles et livrés au bon moment.
+                          C’est pourquoi nous ré-organisons notre production et notre système précommande pour vous garantir des prix maîtrisés, 
+                          une disponibilité adaptée à vos besoins et une qualité suivie avec soin.
+                        </p>
                         <ul class="hero-points">
-                            <li><span class="dot"></span><span>Choisissez entre tomate fruit et tomate en purée, selon vos besoins réels de consommation ou de revente.</span></li>
-                            <li><span class="dot"></span><span>Le prix final n'est pas figé aujourd'hui, il sera fixé à la récolte, avec un engagement clair de rester maîtrisé et compétitif par rapport au marché local.</span></li>
-                            <li><span class="dot"></span><span>Vous pouvez planifier plusieurs livraisons, avec des quantités, dates et adresses différentes sur un seul formulaire.</span></li>
+                            <li><span class="dot"></span><span>La ferme de l'amitié, votre 1er partenaire d'approvisionnement</span></li>
+                            <li><span class="dot"></span><span>Des produits adaptés à vos besoins, au bon moment et au bon prix.</span></li>
+                            <li><span class="dot"></span><span>Réservez plusieurs produits en toute simplicité.</span></li>
                         </ul>
                     </div>
                     <div class="video-card">
