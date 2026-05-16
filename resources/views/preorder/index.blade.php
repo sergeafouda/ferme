@@ -16,9 +16,10 @@
                 <div class="hero-grid">
                     <div>
                         <div class="eyebrow">Précommandez vos produits dès maintenant</div>
-                        <h1>Des produits de qualité, disponibles quand vous en avez besoin, à un prix compétitif</h1>
+                        <h1>La Ferme de l'Amitié</h1>
+                        <h3>Des produits de qualité, disponibles quand vous en avez besoin, à un prix compétitif</h3>
                         <p class="lead">Nous savons que ce qui compte le plus pour vous, c’est d’avoir des produits fiables, accessibles et livrés au bon moment.
-                          C’est pourquoi nous ré-organisons notre production et notre système précommande pour vous garantir des prix maîtrisés, 
+                          C’est pourquoi nous ré-organisons notre production et notre système de précommande pour vous garantir des prix maîtrisés, 
                           une disponibilité adaptée à vos besoins et une qualité suivie avec soin.
                         </p>
                         <ul class="hero-points">
